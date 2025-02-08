@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainlox Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMBjtNiz5EtqzMUKRh8kXTzXOCOKMd5N9Y8sm49" crossorigin="anonymous">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f4; 
+            text-align: center; 
+            padding: 20px; 
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        header img {
+            width: 100px;
+            margin-right: 20px;
+        }
+        header h1 {
+            font-size: 2em;
+            margin: 0;
+        }
+        #chatbox { 
+            width: 80%; 
+            max-width: 600px; 
+            height: 500px; 
+            background: white; 
+            margin: auto; 
+            overflow-y: scroll; 
+            padding: 10px; 
+            border-radius: 10px; 
+            border: 1px solid #ccc; 
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); 
+        }
+        .message { 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin: 5px 0; 
+            max-width: 75%; 
+            word-wrap: break-word;
+        }
+        .user-message { 
+            background: #007bff; 
+            color: white; 
+            text-align: right; 
+            margin-left: auto; 
+        }
+        .bot-message { 
+            background: #e5e5ea; 
+            color: black; 
+            text-align: left; 
+            margin-right: auto; 
+        }
+        #input-area { 
+            display: flex; 
+            justify-content: center; 
+            margin-top: 20px; 
+        }
+        input { 
+            width: 70%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            outline: none;
+        }
+        button { 
+            padding: 10px 15px; 
+            border: none; 
+            background: #28a745; 
+            color: white; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin-left: 10px; 
+            outline: none;
+        }
+        button:hover { 
+            background: #218838; 
+        }
+        button:active, input:focus { 
+            outline: none; 
+            box-shadow: 0 0 3px 2px rgba(0, 123, 255, 0.5);
+        }
+        .course-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .course-link:hover {
+            text-decoration: underline;
+        }
+        .icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://brainlox.com/images/brainLox_logo.jpeg" alt="Brainlox Logo">
+        <h1>Brainlox Chatbot</h1>
+    </header>
+
+    <div id="chatbox"></div>
+
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Type a message..." onkeydown="checkEnter(event)" />
+        <button onclick="sendMessage()"><i class="fas fa-paper-plane icon"></i>Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var inputElement = document.getElementById("userInput");
+            var message = inputElement.value.trim();
+
+            if (message === "") return;
+
+            var chatbox = document.getElementById("chatbox");
+
+            // Display user message
+            var userMessage = document.createElement("div");
+            userMessage.className = "message user-message";
+            userMessage.textContent = "You: " + message;
+            chatbox.appendChild(userMessage);
+
+            inputElement.value = ""; // Clear input
+
+            // Send to API
+            fetch("/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                var botMessage = document.createElement("div");
+                botMessage.className = "message bot-message";
+                botMessage.innerHTML = "AI: " + data.response;
+                chatbox.appendChild(botMessage);
+                chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function checkEnter(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+    </script>
+
+</body>
+</html>
